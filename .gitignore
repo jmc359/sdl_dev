@@ -1,0 +1,7 @@
+*
+!*.cpp
+!README.md
+!CMakeLists.txt
+!**/src
+!**/headers
+!.gitignore

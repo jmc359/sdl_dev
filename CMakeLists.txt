@@ -1,12 +1,24 @@
 cmake_minimum_required(VERSION 2.6)
 project(sdl_dev)
 
-set(BIN_DIR ${sdl_dev_SOURCE_DIR}/bin)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic")
 
 find_library(SDL2_LIBRARY NAMES sdl2 HINTS "/usr/local/Cellar")
 find_library(SDL2_IMAGE_LIBRARY NAMES sdl2_image HINTS "/usr/local/Cellar")
 
-include_directories(${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR})
-add_executable (main src/main.cpp)
-target_link_libraries(main ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY})
+add_library(mylib
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/game.hpp
+)
+
+target_sources(mylib
+PUBLIC
+${CMAKE_CURRENT_SOURCE_DIR}/src/game.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/include/game.hpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+)
+
+include_directories(${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include/)
+
+add_executable(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
+target_link_libraries(${PROJECT_NAME} mylib ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY})
