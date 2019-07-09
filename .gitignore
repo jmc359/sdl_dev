@@ -3,5 +3,8 @@
 !README.md
 !CMakeLists.txt
 !**/src
-!**/headers
+!**/include
 !.gitignore
+!**/build
+!*.hpp
+
