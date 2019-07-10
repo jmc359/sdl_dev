@@ -28,6 +28,9 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
     else{
         isRunning = false;
     }
+    SDL_Surface *tmpSurface = IMG_Load("../assets/character.png");
+    playerTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+    SDL_FreeSurface(tmpSurface);
 }
 
 // Take care of events while game engine is running
@@ -45,16 +48,17 @@ void Game::handleEvents(){
     }
 }
 
-// Update count
+// Update
 void Game::update(){
     cnt++;
-    std::cout << cnt << std::endl;
+    destR.h = 192;
+    destR.w = 256;
 }
 
 // Add objects to renderer
 void Game::render(){
     SDL_RenderClear(renderer);
-    // add stuff to renderer
+    SDL_RenderCopy(renderer, playerTex, NULL, &destR);
     SDL_RenderPresent(renderer);
 }
 

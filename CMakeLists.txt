@@ -11,13 +11,6 @@ add_library(mylib
 	${CMAKE_CURRENT_SOURCE_DIR}/include/game.hpp
 )
 
-target_sources(mylib
-PUBLIC
-${CMAKE_CURRENT_SOURCE_DIR}/src/game.cpp
-${CMAKE_CURRENT_SOURCE_DIR}/include/game.hpp
-${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-)
-
 include_directories(${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 
 add_executable(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)

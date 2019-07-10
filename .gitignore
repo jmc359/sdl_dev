@@ -7,4 +7,5 @@
 !.gitignore
 !**/build
 !*.hpp
+!**/assets
 
