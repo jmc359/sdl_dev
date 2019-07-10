@@ -22,7 +22,8 @@ private:
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 	SDL_Texture *playerTex;
-	SDL_Rect srcR, destR;
+	SDL_Rect playerRect;
+	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
 };
 
 #endif

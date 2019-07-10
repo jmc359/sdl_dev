@@ -31,6 +31,9 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
     SDL_Surface *tmpSurface = IMG_Load("../assets/character.png");
     playerTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
     SDL_FreeSurface(tmpSurface);
+
+    playerRect.h = 192;
+    playerRect.w = 256;
 }
 
 // Take care of events while game engine is running
@@ -51,14 +54,24 @@ void Game::handleEvents(){
 // Update
 void Game::update(){
     cnt++;
-    destR.h = 192;
-    destR.w = 256;
+    if (keystate[SDL_SCANCODE_LEFT]){
+        playerRect.x-=2;
+    }
+    else if (keystate[SDL_SCANCODE_RIGHT]){
+        playerRect.x+=2;
+    }
+    else if (keystate[SDL_SCANCODE_DOWN]){
+        playerRect.y+=2;
+    }
+    else if (keystate[SDL_SCANCODE_UP]){
+        playerRect.y-=2;
+    }
 }
 
 // Add objects to renderer
 void Game::render(){
     SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, playerTex, NULL, &destR);
+    SDL_RenderCopy(renderer, playerTex, NULL, &playerRect);
     SDL_RenderPresent(renderer);
 }
 
