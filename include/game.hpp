@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_Image.h>
+#include <SDL2/SDL_TTF.h>
 #include <iostream>
 
 class Game{
@@ -14,6 +15,7 @@ public:
 	void update();
 	void render();
 	void clean();
+	void createSurfaces();
 	bool running(){ return isRunning; }
 
 private:
@@ -28,8 +30,8 @@ private:
 
 	SDL_Window *window; 
 	SDL_Renderer *renderer; 
-	SDL_Texture *playerTex, *spaceTex;
-	SDL_Rect playerRect; 
+	SDL_Texture *playerTex, *spaceTex, *messageTex;
+	SDL_Rect playerRect, messageRect; 
 };
 
 #endif

@@ -2,7 +2,7 @@
 
 int main(void){
 	Game *game = new Game();
-	game->init("Space Force", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1080, 600, true);
+	game->init("Space Force", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1080, 600, false);
 
 	int frameTime;
 	uint32_t frameStart;
