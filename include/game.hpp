@@ -5,6 +5,7 @@
 #include <SDL2/SDL_Image.h>
 #include <SDL2/SDL_TTF.h>
 #include <iostream>
+#include "agent.hpp"
 
 class Game{
 public:
@@ -19,19 +20,17 @@ public:
 	bool running(){ return isRunning; }
 
 private:
-	int moveRate = 5;
-	int playerH = 192;
-	int playerW = 256;
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
 
 	int width; 
 	int height; 
-	bool isRunning; 
+	bool isRunning;
+	Agent *player; 
 
 	SDL_Window *window; 
 	SDL_Renderer *renderer; 
-	SDL_Texture *playerTex, *spaceTex, *messageTex;
-	SDL_Rect playerRect, messageRect; 
+	SDL_Texture *spaceTex, *messageTex;
+	SDL_Rect messageRect; 
 };
 
 #endif

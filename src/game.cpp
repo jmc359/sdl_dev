@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include "agent.hpp"
 
 Game::Game(){}
 Game::~Game(){}
@@ -37,7 +38,11 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
         isRunning = false;
     }
 
-    // set width, height for window and player
+    // initialize player
+    player = new Agent();
+    player->init("../assets/character.png", 0, 0, 256, 192, renderer);
+
+    // set width, height for window
     this->width = width;
     this->height = height;
 
@@ -45,11 +50,6 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 }
 
 void Game::createSurfaces(){
-    // load assets
-    SDL_Surface *playerSurface = IMG_Load("../assets/character.png");
-    playerTex = SDL_CreateTextureFromSurface(renderer, playerSurface);
-    SDL_FreeSurface(playerSurface);
-
     SDL_Surface *spaceSurface = IMG_Load("../assets/space.png");
     spaceTex = SDL_CreateTextureFromSurface(renderer, spaceSurface);
     SDL_FreeSurface(spaceSurface);
@@ -64,11 +64,6 @@ void Game::createSurfaces(){
     messageRect.w = 600;
     messageRect.x = width/2 - messageRect.w/2;
     messageRect.y = height/2 - messageRect.h/2;
-
-    playerRect.x = 0;
-    playerRect.y = height/2 - playerH/2;
-    playerRect.h = playerH;
-    playerRect.w = playerW;
 }
 
 // Take care of events while game engine is running
@@ -90,18 +85,7 @@ void Game::handleEvents(){
 // Update
 void Game::update(){
     // Move character according to keystroke
-    if (keystate[SDL_SCANCODE_LEFT] && playerRect.x > -playerW/2){
-        playerRect.x -= moveRate;
-    }
-    else if (keystate[SDL_SCANCODE_RIGHT] && playerRect.x < width-playerW/4){
-        playerRect.x += moveRate;
-    }
-    else if (keystate[SDL_SCANCODE_UP] && playerRect.y > -playerH/2){
-        playerRect.y -= moveRate;
-    }
-    else if (keystate[SDL_SCANCODE_DOWN] && playerRect.y < height-playerH/4){
-        playerRect.y += moveRate;
-    }
+    player->updatePosition(width, height, keystate);
 }
 
 // Add objects to renderer
@@ -110,7 +94,7 @@ void Game::render(){
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, spaceTex, NULL, NULL);
     SDL_RenderCopy(renderer, messageTex, NULL, &messageRect);
-    SDL_RenderCopy(renderer, playerTex, NULL, &playerRect);
+    player->render();
     SDL_RenderPresent(renderer);
 }
 
