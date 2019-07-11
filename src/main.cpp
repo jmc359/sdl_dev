@@ -1,10 +1,8 @@
 #include "game.hpp"
 
-Game *game = nullptr;
-
 int main(void){
-	game = new Game();
-	game->init("Space Force", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, false);
+	Game *game = new Game();
+	game->init("Space Force", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1080, 600, true);
 
 	int frameTime;
 	uint32_t frameStart;

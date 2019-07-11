@@ -10,6 +10,7 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
         flags = SDL_WINDOW_FULLSCREEN;
     }
 
+    // Initialize window, renderer, colros
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0){
         std::cout << "Subsystems Initialized" << std::endl;
         
@@ -28,10 +29,17 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
     else{
         isRunning = false;
     }
-    SDL_Surface *tmpSurface = IMG_Load("../assets/character.png");
-    playerTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
-    SDL_FreeSurface(tmpSurface);
 
+    // load assets
+    SDL_Surface *playerSurface = IMG_Load("../assets/character.png");
+    playerTex = SDL_CreateTextureFromSurface(renderer, playerSurface);
+    SDL_FreeSurface(playerSurface);
+
+    SDL_Surface *spaceSurface = IMG_Load("../assets/space.png");
+    spaceTex = SDL_CreateTextureFromSurface(renderer, spaceSurface);
+    SDL_FreeSurface(spaceSurface);
+
+    // set width, height for window and player
     this->width = width;
     this->height = height;
     playerRect.h = playerH;
@@ -40,6 +48,7 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 
 // Take care of events while game engine is running
 void Game::handleEvents(){
+    // look for quit
     SDL_Event event;
     SDL_PollEvent(&event);
 
@@ -59,20 +68,22 @@ void Game::update(){
     if (keystate[SDL_SCANCODE_LEFT] && playerRect.x > -playerW/2){
         playerRect.x -= moveRate;
     }
-    else if (keystate[SDL_SCANCODE_RIGHT] && playerRect.x < width-playerW/2){
+    else if (keystate[SDL_SCANCODE_RIGHT] && playerRect.x < width-playerW/4){
         playerRect.x += moveRate;
     }
     else if (keystate[SDL_SCANCODE_UP] && playerRect.y > -playerH/2){
         playerRect.y -= moveRate;
     }
-    else if (keystate[SDL_SCANCODE_DOWN] && playerRect.y < height-playerH/2){
+    else if (keystate[SDL_SCANCODE_DOWN] && playerRect.y < height-playerH/4){
         playerRect.y += moveRate;
     }
 }
 
 // Add objects to renderer
 void Game::render(){
+    // render layer by layer
     SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, spaceTex, NULL, NULL);
     SDL_RenderCopy(renderer, playerTex, NULL, &playerRect);
     SDL_RenderPresent(renderer);
 }

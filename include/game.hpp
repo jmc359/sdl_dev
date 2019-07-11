@@ -14,7 +14,7 @@ public:
 	void update();
 	void render();
 	void clean();
-	bool running() { return isRunning; }
+	bool running(){ return isRunning; }
 
 private:
 	int moveRate = 5;
@@ -23,13 +23,13 @@ private:
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
 
 	int width; 
-	int height;
-	bool isRunning;
-	
-	SDL_Window *window;
-	SDL_Renderer *renderer;
-	SDL_Texture *playerTex;
-	SDL_Rect playerRect;
+	int height; 
+	bool isRunning; 
+
+	SDL_Window *window; 
+	SDL_Renderer *renderer; 
+	SDL_Texture *playerTex, *spaceTex;
+	SDL_Rect playerRect; 
 };
 
 #endif
