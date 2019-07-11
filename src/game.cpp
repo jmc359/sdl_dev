@@ -32,8 +32,10 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
     playerTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
     SDL_FreeSurface(tmpSurface);
 
-    playerRect.h = 192;
-    playerRect.w = 256;
+    this->width = width;
+    this->height = height;
+    playerRect.h = playerH;
+    playerRect.w = playerW;
 }
 
 // Take care of events while game engine is running
@@ -53,18 +55,18 @@ void Game::handleEvents(){
 
 // Update
 void Game::update(){
-    cnt++;
-    if (keystate[SDL_SCANCODE_LEFT]){
-        playerRect.x-=2;
+    // Move character according to keystroke
+    if (keystate[SDL_SCANCODE_LEFT] && playerRect.x > -playerW/2){
+        playerRect.x -= moveRate;
     }
-    else if (keystate[SDL_SCANCODE_RIGHT]){
-        playerRect.x+=2;
+    else if (keystate[SDL_SCANCODE_RIGHT] && playerRect.x < width-playerW/2){
+        playerRect.x += moveRate;
     }
-    else if (keystate[SDL_SCANCODE_DOWN]){
-        playerRect.y+=2;
+    else if (keystate[SDL_SCANCODE_UP] && playerRect.y > -playerH/2){
+        playerRect.y -= moveRate;
     }
-    else if (keystate[SDL_SCANCODE_UP]){
-        playerRect.y-=2;
+    else if (keystate[SDL_SCANCODE_DOWN] && playerRect.y < height-playerH/2){
+        playerRect.y += moveRate;
     }
 }
 

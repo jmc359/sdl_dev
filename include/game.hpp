@@ -17,13 +17,19 @@ public:
 	bool running() { return isRunning; }
 
 private:
-	int cnt = 0;
+	int moveRate = 5;
+	int playerH = 192;
+	int playerW = 256;
+	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
+
+	int width; 
+	int height;
 	bool isRunning;
+	
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 	SDL_Texture *playerTex;
 	SDL_Rect playerRect;
-	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
 };
 
 #endif
