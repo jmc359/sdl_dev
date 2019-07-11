@@ -26,6 +26,7 @@ private:
 	int height; 
 	bool isRunning;
 	Agent *player; 
+	Triangle *enemy;
 
 	SDL_Window *window; 
 	SDL_Renderer *renderer; 

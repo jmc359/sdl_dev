@@ -14,12 +14,22 @@ public:
 	virtual void updatePosition(int screenW, int screenH, const Uint8 *keystate);
 	void render();
 
-private:
+protected:
 	int moveRate = 5;
 	SDL_Rect rect;
 	const char *assetFile;
 	SDL_Texture *texture; 
 	SDL_Renderer *renderer;
+};
+
+class Triangle : public Agent{
+public:
+	using Agent::updatePosition;
+	virtual void updatePosition(){
+		if (rect.x > -rect.w/2){
+	        rect.x -= 3;
+	    }
+	}
 };
 
 #endif

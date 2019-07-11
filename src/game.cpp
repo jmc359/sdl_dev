@@ -42,6 +42,9 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
     player = new Agent();
     player->init("../assets/character.png", 0, 0, 256, 192, renderer);
 
+    enemy = new Triangle();
+    enemy->init("../assets/triangle.png", 800, 400, 100, 100, renderer);
+
     // set width, height for window
     this->width = width;
     this->height = height;
@@ -86,6 +89,7 @@ void Game::handleEvents(){
 void Game::update(){
     // Move character according to keystroke
     player->updatePosition(width, height, keystate);
+    enemy->updatePosition();
 }
 
 // Add objects to renderer
@@ -95,6 +99,7 @@ void Game::render(){
     SDL_RenderCopy(renderer, spaceTex, NULL, NULL);
     SDL_RenderCopy(renderer, messageTex, NULL, &messageRect);
     player->render();
+    enemy->render();
     SDL_RenderPresent(renderer);
 }
 
