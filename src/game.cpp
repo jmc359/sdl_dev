@@ -40,7 +40,7 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 
     // initialize player
     player = new Agent();
-    player->init("../assets/character.png", 0, 0, 256, 192, renderer);
+    player->init("../assets/character.png", 0, 0, 256, 192, renderer, 5);
 
     // set width, height for window
     this->width = width;
@@ -115,8 +115,8 @@ void Game::update(){
         updateRect(&spaceRect2, spaceRect2.x, spaceRect2.y, width, height);
     }
     player->updatePosition(width, height, keystate, &spaceRect1, &spaceRect2);
-    addEnemy(0.02);
-    updateEnemies(10);
+    addEnemy(0.02, 10);
+    updateEnemies();
     removeEnemies();
 }
 
@@ -142,29 +142,28 @@ void Game::clean(){
 }
 
 // populate deque with enemy after 'rate' seconds
-void Game::addEnemy(float rate){
+void Game::addEnemy(float rate, int speed){
     float delay = ((float)(clock() - lastEnemyTime)) / CLOCKS_PER_SEC;
     if (delay > rate){
-        std::cout << delay << " " << rate << std::endl;
         lastEnemyTime = clock();
         srand(rand());
         Triangle *enemy = new Triangle();
-        enemy->init("../assets/triangle.png", width, rand() % (height-100), 100, 100, renderer);
+        enemy->init("../assets/triangle.png", width, rand() % (height-100), 100, 100, renderer, speed);
         enemies.push_back(enemy);
     }
 }
 
 // pop enemy from deque
 void Game::removeEnemies(){
-    while(enemies.size() > 0 && enemies.front()->rect.x + enemies.front()->rect.w < 0){
+    while(enemies.size() > 0 && enemies.front()->rect.x + enemies.front()->rect.w <= 0){
         enemies.pop_front();
     }
 }
 
 // update enemy positions
-void Game::updateEnemies(int rate){
+void Game::updateEnemies(){
     for (auto it = enemies.begin(); it != enemies.end(); it++){
-        (*it)->rect.x -= rate;
+        (*it)->updatePosition();
     }
 }
 

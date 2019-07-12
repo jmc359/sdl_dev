@@ -21,8 +21,8 @@ public:
 	void render();
 	void clean();
 	void createSurfaces();
-	void addEnemy(float rate);
-	void updateEnemies(int rate);
+	void addEnemy(float rate, int speed);
+	void updateEnemies();
 	void removeEnemies();
 	void updateRect(SDL_Rect *rect, int x, int y, int w, int h);
 	bool running(){ return isRunning; }
