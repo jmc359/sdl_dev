@@ -21,10 +21,10 @@ void Agent::init(const char *assetFile, int xPos, int yPos, int width, int heigh
 
 void Agent::updatePosition(int screenW, int screenH, const Uint8* keystate, SDL_Rect *spaceRect1, SDL_Rect *spaceRect2){
     // Move character according to keystroke
-    if (keystate[SDL_SCANCODE_LEFT] && rect.x >= -rect.w/2){
+    if (keystate[SDL_SCANCODE_LEFT] && rect.x >= 0){
         rect.x -= moveRate;
     }
-    if (keystate[SDL_SCANCODE_RIGHT] && rect.x <= screenW/2-rect.w/4){
+    if (keystate[SDL_SCANCODE_RIGHT] && rect.x + rect.w/2 <= screenW/2){
         rect.x += moveRate;
     }
     else if (keystate[SDL_SCANCODE_RIGHT]){
@@ -37,10 +37,10 @@ void Agent::updatePosition(int screenW, int screenH, const Uint8* keystate, SDL_
             spaceRect2->x = spaceRect2->w;
         }
     }
-    if (keystate[SDL_SCANCODE_UP] && rect.y >= -rect.h/2){
+    if (keystate[SDL_SCANCODE_UP] && rect.y >= 0){
         rect.y -= moveRate;
     }
-    if (keystate[SDL_SCANCODE_DOWN] && rect.y <= screenH-rect.h/4){
+    if (keystate[SDL_SCANCODE_DOWN] && rect.y + rect.h <= screenH){
         rect.y += moveRate;
     }
 }
