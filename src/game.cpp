@@ -47,17 +47,25 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
     this->height = height;
 
     createSurfaces();
-    startScreen();
+    startScreen(0.5);
 }
 
 // Render start screen
-void Game::startScreen(){
+void Game::startScreen(double blinkRate){
+    bool blink = false;
     while (!keystate[SDL_SCANCODE_RETURN] && isRunning){
+        int delay = time(NULL) - lastBlink;
+        if (delay > blinkRate){
+            blink = !blink;
+            lastBlink = time(NULL);
+        }
         handleEvents();
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, spaceTex, NULL, NULL);
         SDL_RenderCopy(renderer, messageTex, NULL, &messageRect);
-        SDL_RenderCopy(renderer, instructionTex, NULL, &instructionRect);
+        if (blink){
+            SDL_RenderCopy(renderer, instructionTex, NULL, &instructionRect);
+        }
         SDL_RenderPresent(renderer);
     }
 }

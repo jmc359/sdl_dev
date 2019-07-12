@@ -15,7 +15,7 @@ public:
 	Game();
 	~Game();
 	void init(const char *title, int xpos, int ypos, int width, int height, bool fullscreen);
-	void startScreen();
+	void startScreen(double blinkRate);
 	void handleEvents();
 	void update();
 	void render();
@@ -28,7 +28,8 @@ public:
 
 private:
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-	int lastEnemyTime = time(NULL);
+	double lastEnemyTime = time(NULL);
+	double lastBlink = time(NULL);
 	int width; 
 	int height; 
 	bool isRunning;
