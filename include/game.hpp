@@ -4,7 +4,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_Image.h>
 #include <SDL2/SDL_TTF.h>
+#include <stdlib.h>
+#include <time.h>
 #include <iostream>
+#include <deque>
 #include "agent.hpp"
 
 class Game{
@@ -17,16 +20,19 @@ public:
 	void render();
 	void clean();
 	void createSurfaces();
+	void addEnemy(double rate);
+	void updateEnemies();
+	void removeEnemies();
 	bool running(){ return isRunning; }
 
 private:
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-
+	int lastEnemyTime = time(NULL);
 	int width; 
 	int height; 
 	bool isRunning;
 	Agent *player; 
-	Triangle *enemy;
+	std::deque<Triangle *> enemies;
 
 	SDL_Window *window; 
 	SDL_Renderer *renderer; 

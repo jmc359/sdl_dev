@@ -13,10 +13,10 @@ public:
 	void init(const char *assetFile, int xPos, int yPos, int width, int height, SDL_Renderer *renderer);
 	virtual void updatePosition(int screenW, int screenH, const Uint8 *keystate);
 	void render();
+	SDL_Rect rect;
 
 protected:
 	int moveRate = 5;
-	SDL_Rect rect;
 	const char *assetFile;
 	SDL_Texture *texture; 
 	SDL_Renderer *renderer;

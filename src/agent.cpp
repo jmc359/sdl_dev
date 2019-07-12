@@ -11,7 +11,6 @@ void Agent::init(const char *assetFile, int xPos, int yPos, int width, int heigh
     rect.w = width;
     rect.h = height;
 
-
     SDL_Surface *surface = IMG_Load(assetFile);
     texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);

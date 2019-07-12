@@ -42,9 +42,6 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
     player = new Agent();
     player->init("../assets/character.png", 0, 0, 256, 192, renderer);
 
-    enemy = new Triangle();
-    enemy->init("../assets/triangle.png", 800, 400, 100, 100, renderer);
-
     // set width, height for window
     this->width = width;
     this->height = height;
@@ -89,7 +86,9 @@ void Game::handleEvents(){
 void Game::update(){
     // Move character according to keystroke
     player->updatePosition(width, height, keystate);
-    enemy->updatePosition();
+    addEnemy(0.5);
+    updateEnemies();
+    removeEnemies();
 }
 
 // Add objects to renderer
@@ -99,7 +98,9 @@ void Game::render(){
     SDL_RenderCopy(renderer, spaceTex, NULL, NULL);
     SDL_RenderCopy(renderer, messageTex, NULL, &messageRect);
     player->render();
-    enemy->render();
+    for (auto it = enemies.begin(); it != enemies.end(); it++){
+        (*it)->render();
+    }
     SDL_RenderPresent(renderer);
 }
 
@@ -109,5 +110,28 @@ void Game::clean(){
     SDL_DestroyRenderer(renderer);
     SDL_Quit();
     std::cout << "Game cleaned" << std::endl;
+}
+
+void Game::addEnemy(double rate){
+    int delay = time(NULL) - lastEnemyTime;
+    if (delay > rate){
+        lastEnemyTime = time(NULL);
+        srand(rand());
+        Triangle *enemy = new Triangle();
+        enemy->init("../assets/triangle.png", width, rand() % (height-100), 100, 100, renderer);
+        enemies.push_back(enemy);
+    }
+}
+
+void Game::removeEnemies(){
+    while(enemies.size() > 0 && enemies.front()->rect.x + enemies.front()->rect.w < 0){
+        enemies.pop_front();
+    }
+}
+
+void Game::updateEnemies(){
+    for (auto it = enemies.begin(); it != enemies.end(); it++){
+        (*it)->rect.x -= 3;
+    }
 }
 
