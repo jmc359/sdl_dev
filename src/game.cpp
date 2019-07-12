@@ -6,9 +6,9 @@ Game::~Game(){}
 
 // Initialize gaming window
 void Game::init(const char *title, int xpos, int ypos, int width, int height, bool fullscreen){
-    int flags = 0;
+    int flags = SDL_WINDOW_RESIZABLE;
     if (fullscreen){
-        flags = SDL_WINDOW_FULLSCREEN;
+        flags |= SDL_WINDOW_FULLSCREEN;
     }
 
     // Initialize window, renderer, colros
@@ -54,6 +54,11 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 void Game::startScreen(double blinkRate){
     bool blink = false;
     while (!keystate[SDL_SCANCODE_RETURN] && isRunning){
+        SDL_GetWindowSize(window, &width, &height);
+        updateRect(&spaceRect1, 0, 0, width, height);
+        updateRect(&spaceRect2, width, 0, width, height);
+        updateRect(&messageRect, width/2 - messageRect.w/2, height/2 - messageRect.h, 600, 300);
+        updateRect(&instructionRect, messageRect.x + messageRect.w/8, messageRect.y + messageRect.h, 400, 100);
         int delay = time(NULL) - lastBlink;
         if (delay > blinkRate){
             blink = !blink;
@@ -61,7 +66,8 @@ void Game::startScreen(double blinkRate){
         }
         handleEvents();
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, spaceTex, NULL, NULL);
+        SDL_RenderCopy(renderer, spaceTex1, NULL, NULL);
+        SDL_RenderCopy(renderer, spaceTex2, NULL, NULL);
         SDL_RenderCopy(renderer, messageTex, NULL, &messageRect);
         if (blink){
             SDL_RenderCopy(renderer, instructionTex, NULL, &instructionRect);
@@ -72,31 +78,12 @@ void Game::startScreen(double blinkRate){
 
 // create all background surfaces
 void Game::createSurfaces(){
-    SDL_Surface *spaceSurface = IMG_Load("../assets/space.png");
-    spaceTex = SDL_CreateTextureFromSurface(renderer, spaceSurface);
-    SDL_FreeSurface(spaceSurface);
-
-    TTF_Font* bigSans = TTF_OpenFont("../fonts/OpenSans-Regular.ttf", 36); //this opens a font style and sets a size
-    SDL_Color Red = {255,0,0,255};  // this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
-    SDL_Surface* messageSurface = TTF_RenderText_Solid(bigSans, "Space Force", Red); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
-    messageTex = SDL_CreateTextureFromSurface(renderer, messageSurface); //now you can convert it into a texture
-    SDL_FreeSurface(messageSurface);
-
-    TTF_Font* Sans = TTF_OpenFont("../fonts/OpenSans-Regular.ttf", 24); //this opens a font style and sets a size
-    SDL_Color White = {255,255,255,255};  // this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
-    SDL_Surface* instructionSurface = TTF_RenderText_Solid(Sans, "Press 'Return' to Begin", White); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
-    instructionTex = SDL_CreateTextureFromSurface(renderer, instructionSurface); //now you can convert it into a texture
-    SDL_FreeSurface(instructionSurface);
-
-    messageRect.h = 300;
-    messageRect.w = 600;
-    messageRect.x = width/2 - messageRect.w/2;
-    messageRect.y = height/2 - messageRect.h;
-
-    instructionRect.h = 100;
-    instructionRect.w = 400;
-    instructionRect.x = messageRect.x + messageRect.w/8;
-    instructionRect.y = messageRect.y + messageRect.h;
+    spaceTex1 = generateTexture("../assets/space.png");
+    spaceTex2 = generateTexture("../assets/space.png");
+    messageTex = generateFont("../fonts/OpenSans-Regular.ttf", 36, "Space Force", {255,0,0,255});
+    instructionTex = generateFont("../fonts/OpenSans-Regular.ttf", 24, "Press 'Return' to Begin", {255,255,255,255});
+    updateRect(&messageRect, width/2 - messageRect.w/2, height/2 - messageRect.h, 600, 300);
+    updateRect(&instructionRect, messageRect.x + messageRect.w/8, messageRect.y + messageRect.h, 400, 100);
 }
 
 // Take care of events while game engine is running
@@ -109,17 +96,27 @@ void Game::handleEvents(){
         case SDL_QUIT:
             isRunning = false;
             break;
-
         default:
             break;
     }
 }
 
-// Move agents appropriately
+// Move agents and textures appropriately
 void Game::update(){
-    player->updatePosition(width, height, keystate);
-    addEnemy(0.5);
-    updateEnemies();
+    int w = width;
+    int h = height;
+    SDL_GetWindowSize(window, &width, &height);
+    if (w != width or h != height){
+        updateRect(&spaceRect1, 0, 0, width, height);
+        updateRect(&spaceRect2, width, 0, width, height);
+    }
+    else{
+        updateRect(&spaceRect1, spaceRect1.x, spaceRect1.y, width, height);
+        updateRect(&spaceRect2, spaceRect2.x, spaceRect2.y, width, height);
+    }
+    player->updatePosition(width, height, keystate, &spaceRect1, &spaceRect2);
+    addEnemy(0.1);
+    updateEnemies(10);
     removeEnemies();
 }
 
@@ -127,7 +124,8 @@ void Game::update(){
 void Game::render(){
     // render layer by layer
     SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, spaceTex, NULL, NULL);
+    SDL_RenderCopy(renderer, spaceTex1, NULL, &spaceRect1);
+    SDL_RenderCopy(renderer, spaceTex2, NULL, &spaceRect2);
     player->render();
     for (auto it = enemies.begin(); it != enemies.end(); it++){
         (*it)->render();
@@ -140,12 +138,12 @@ void Game::clean(){
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
     SDL_Quit();
-    std::cout << "Game cleaned" << std::endl;
+    std::cout << "Game Cleaned" << std::endl;
 }
 
 // populate deque with enemy after 'rate' seconds
 void Game::addEnemy(double rate){
-    int delay = time(NULL) - lastEnemyTime;
+    double delay = time(NULL) - lastEnemyTime;
     if (delay > rate){
         lastEnemyTime = time(NULL);
         srand(rand());
@@ -163,9 +161,34 @@ void Game::removeEnemies(){
 }
 
 // update enemy positions
-void Game::updateEnemies(){
+void Game::updateEnemies(int rate){
     for (auto it = enemies.begin(); it != enemies.end(); it++){
-        (*it)->rect.x -= 3;
+        (*it)->rect.x -= rate;
     }
+}
+
+// generate SDL texture given file name
+SDL_Texture *Game::generateTexture(const char *filename){
+    SDL_Surface *surface = IMG_Load(filename);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    return texture;
+}
+
+// generate SDL font given file name and relevant parameters
+SDL_Texture *Game::generateFont(const char *filename, int fontSize, const char *text, SDL_Color color){
+    TTF_Font *font = TTF_OpenFont(filename, fontSize); //this opens a font style and sets a size
+    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface); //now you can convert it into a texture
+    SDL_FreeSurface(surface);
+    return texture;
+}
+
+// update SDL_Rect attributes
+void Game::updateRect(SDL_Rect *rect, int x, int y, int w, int h){
+    rect->x = x;
+    rect->y = y;
+    rect->w = w;
+    rect->h = h;
 }
 

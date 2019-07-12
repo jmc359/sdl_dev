@@ -9,6 +9,7 @@
 #include <iostream>
 #include <deque>
 #include "agent.hpp"
+#include <chrono>
 
 class Game{
 public:
@@ -22,14 +23,18 @@ public:
 	void clean();
 	void createSurfaces();
 	void addEnemy(double rate);
-	void updateEnemies();
+	void updateEnemies(int rate);
 	void removeEnemies();
+	void updateRect(SDL_Rect *rect, int x, int y, int w, int h);
 	bool running(){ return isRunning; }
+	SDL_Texture *generateTexture(const char *filename);
+	SDL_Texture *generateFont(const char *filename, int fontSize, const char *text, SDL_Color color);
 
 private:
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
 	double lastEnemyTime = time(NULL);
 	double lastBlink = time(NULL);
+
 	int width; 
 	int height; 
 	bool isRunning;
@@ -38,8 +43,8 @@ private:
 
 	SDL_Window *window; 
 	SDL_Renderer *renderer; 
-	SDL_Texture *spaceTex, *messageTex, *instructionTex;
-	SDL_Rect messageRect, instructionRect; 
+	SDL_Texture *spaceTex1, *spaceTex2, *messageTex, *instructionTex;
+	SDL_Rect spaceRect1, spaceRect2, messageRect, instructionRect; 
 };
 
 #endif

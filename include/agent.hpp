@@ -11,7 +11,7 @@ public:
 	Agent();
 	~Agent();
 	void init(const char *assetFile, int xPos, int yPos, int width, int height, SDL_Renderer *renderer);
-	virtual void updatePosition(int screenW, int screenH, const Uint8 *keystate);
+	virtual void updatePosition(int screenW, int screenH, const Uint8 *keystate, SDL_Rect *spaceRect1, SDL_Rect *spaceRect2);
 	void render();
 	SDL_Rect rect;
 
