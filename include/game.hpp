@@ -15,6 +15,7 @@ public:
 	Game();
 	~Game();
 	void init(const char *title, int xpos, int ypos, int width, int height, bool fullscreen);
+	void startScreen();
 	void handleEvents();
 	void update();
 	void render();
@@ -36,8 +37,8 @@ private:
 
 	SDL_Window *window; 
 	SDL_Renderer *renderer; 
-	SDL_Texture *spaceTex, *messageTex;
-	SDL_Rect messageRect; 
+	SDL_Texture *spaceTex, *messageTex, *instructionTex;
+	SDL_Rect messageRect, instructionRect; 
 };
 
 #endif

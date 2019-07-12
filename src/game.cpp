@@ -47,23 +47,48 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
     this->height = height;
 
     createSurfaces();
+    startScreen();
 }
 
+// Render start screen
+void Game::startScreen(){
+    while (!keystate[SDL_SCANCODE_RETURN] && isRunning){
+        handleEvents();
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, spaceTex, NULL, NULL);
+        SDL_RenderCopy(renderer, messageTex, NULL, &messageRect);
+        SDL_RenderCopy(renderer, instructionTex, NULL, &instructionRect);
+        SDL_RenderPresent(renderer);
+    }
+}
+
+// create all background surfaces
 void Game::createSurfaces(){
     SDL_Surface *spaceSurface = IMG_Load("../assets/space.png");
     spaceTex = SDL_CreateTextureFromSurface(renderer, spaceSurface);
     SDL_FreeSurface(spaceSurface);
 
-    TTF_Font* Sans = TTF_OpenFont("../fonts/OpenSans-Regular.ttf", 36); //this opens a font style and sets a size
+    TTF_Font* bigSans = TTF_OpenFont("../fonts/OpenSans-Regular.ttf", 36); //this opens a font style and sets a size
     SDL_Color Red = {255,0,0,255};  // this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
-    SDL_Surface* messageSurface = TTF_RenderText_Solid(Sans, "Space Force", Red); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
+    SDL_Surface* messageSurface = TTF_RenderText_Solid(bigSans, "Space Force", Red); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
     messageTex = SDL_CreateTextureFromSurface(renderer, messageSurface); //now you can convert it into a texture
     SDL_FreeSurface(messageSurface);
+
+    TTF_Font* Sans = TTF_OpenFont("../fonts/OpenSans-Regular.ttf", 24); //this opens a font style and sets a size
+    SDL_Color White = {255,255,255,255};  // this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
+    SDL_Surface* instructionSurface = TTF_RenderText_Solid(Sans, "Press 'Return' to Begin", White); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
+    instructionTex = SDL_CreateTextureFromSurface(renderer, instructionSurface); //now you can convert it into a texture
+    SDL_FreeSurface(instructionSurface);
 
     messageRect.h = 300;
     messageRect.w = 600;
     messageRect.x = width/2 - messageRect.w/2;
-    messageRect.y = height/2 - messageRect.h/2;
+    messageRect.y = height/2 - messageRect.h;
+
+    instructionRect.h = 100;
+    instructionRect.w = 400;
+    instructionRect.x = messageRect.x + messageRect.w/8;
+    instructionRect.y = messageRect.y + messageRect.h;
 }
 
 // Take care of events while game engine is running
@@ -82,9 +107,8 @@ void Game::handleEvents(){
     }
 }
 
-// Update
+// Move agents appropriately
 void Game::update(){
-    // Move character according to keystroke
     player->updatePosition(width, height, keystate);
     addEnemy(0.5);
     updateEnemies();
@@ -96,7 +120,6 @@ void Game::render(){
     // render layer by layer
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, spaceTex, NULL, NULL);
-    SDL_RenderCopy(renderer, messageTex, NULL, &messageRect);
     player->render();
     for (auto it = enemies.begin(); it != enemies.end(); it++){
         (*it)->render();
@@ -112,6 +135,7 @@ void Game::clean(){
     std::cout << "Game cleaned" << std::endl;
 }
 
+// populate deque with enemy after 'rate' seconds
 void Game::addEnemy(double rate){
     int delay = time(NULL) - lastEnemyTime;
     if (delay > rate){
@@ -123,12 +147,14 @@ void Game::addEnemy(double rate){
     }
 }
 
+// pop enemy from deque
 void Game::removeEnemies(){
     while(enemies.size() > 0 && enemies.front()->rect.x + enemies.front()->rect.w < 0){
         enemies.pop_front();
     }
 }
 
+// update enemy positions
 void Game::updateEnemies(){
     for (auto it = enemies.begin(); it != enemies.end(); it++){
         (*it)->rect.x -= 3;
