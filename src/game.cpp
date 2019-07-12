@@ -115,7 +115,7 @@ void Game::update(){
         updateRect(&spaceRect2, spaceRect2.x, spaceRect2.y, width, height);
     }
     player->updatePosition(width, height, keystate, &spaceRect1, &spaceRect2);
-    addEnemy(0.1);
+    addEnemy(0.02);
     updateEnemies(10);
     removeEnemies();
 }
@@ -142,10 +142,11 @@ void Game::clean(){
 }
 
 // populate deque with enemy after 'rate' seconds
-void Game::addEnemy(double rate){
-    double delay = time(NULL) - lastEnemyTime;
+void Game::addEnemy(float rate){
+    float delay = ((float)(clock() - lastEnemyTime)) / CLOCKS_PER_SEC;
     if (delay > rate){
-        lastEnemyTime = time(NULL);
+        std::cout << delay << " " << rate << std::endl;
+        lastEnemyTime = clock();
         srand(rand());
         Triangle *enemy = new Triangle();
         enemy->init("../assets/triangle.png", width, rand() % (height-100), 100, 100, renderer);

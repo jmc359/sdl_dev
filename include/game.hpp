@@ -9,7 +9,6 @@
 #include <iostream>
 #include <deque>
 #include "agent.hpp"
-#include <chrono>
 
 class Game{
 public:
@@ -22,7 +21,7 @@ public:
 	void render();
 	void clean();
 	void createSurfaces();
-	void addEnemy(double rate);
+	void addEnemy(float rate);
 	void updateEnemies(int rate);
 	void removeEnemies();
 	void updateRect(SDL_Rect *rect, int x, int y, int w, int h);
@@ -32,7 +31,7 @@ public:
 
 private:
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-	double lastEnemyTime = time(NULL);
+	clock_t lastEnemyTime = clock();
 	double lastBlink = time(NULL);
 
 	int width; 
