@@ -40,7 +40,7 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 
     // initialize player
     player = new Player();
-    player->init("../assets/character.png", 0, 0, 256, 192, renderer, 5);
+    player->init("../assets/character.png", 0, 0, height/4, width/3, renderer, 5);
 
     // set width, height for window
     this->width = width;
