@@ -38,6 +38,7 @@ private:
 	int width; 
 	int height; 
 	bool isRunning;
+	const char *title;
 	Agent *player; 
 	std::deque<Triangle *> enemies;
 

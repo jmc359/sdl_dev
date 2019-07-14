@@ -28,8 +28,8 @@ public:
 	using Agent::updatePosition;
 	virtual void updatePosition(int screenW, int screenH, const Uint8* keystate, SDL_Rect *spaceRect1, SDL_Rect *spaceRect2){
     // Move character according to keystroke
-	rect.h = screenH/3;
-	rect.w = screenW/4;
+	rect.w = screenW/5;
+	rect.h = screenH/3.5;
     if (keystate[SDL_SCANCODE_LEFT] && rect.x >= 0){
         rect.x -= moveRate;
     }

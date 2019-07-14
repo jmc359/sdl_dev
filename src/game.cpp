@@ -40,11 +40,12 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 
     // initialize player
     player = new Player();
-    player->init("../assets/character.png", 0, 0, height/4, width/3, renderer, 5);
+    player->init("../assets/character.png", 0, 0, height/5, width/3.5, renderer, 5);
 
     // set width, height for window
     this->width = width;
     this->height = height;
+    this->title = title;
 
     createSurfaces();
     startScreen(0.5);
@@ -80,7 +81,7 @@ void Game::startScreen(double blinkRate){
 void Game::createSurfaces(){
     spaceTex1 = generateTexture("../assets/space.png");
     spaceTex2 = generateTexture("../assets/space.png");
-    messageTex = generateFont("../fonts/OpenSans-Regular.ttf", 36, "Space Force", {255,0,0,255});
+    messageTex = generateFont("../fonts/OpenSans-Regular.ttf", 36, title, {255,0,0,255});
     instructionTex = generateFont("../fonts/OpenSans-Regular.ttf", 24, "Press 'Return' to Begin", {255,255,255,255});
     updateRect(&messageRect, width/2 - messageRect.w/2, height/2 - messageRect.h, 600, 300);
     updateRect(&instructionRect, messageRect.x + messageRect.w/8, messageRect.y + messageRect.h, 400, 100);
