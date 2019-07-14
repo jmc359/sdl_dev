@@ -14,19 +14,23 @@ class Game{
 public:
 	Game();
 	~Game();
+
 	void init(const char *title, int xpos, int ypos, int width, int height, bool fullscreen);
 	void startScreen(double blinkRate);
+	void checkPause();
 	void handleEvents();
 	void update();
 	void render();
 	void clean();
+	void run();
 	void createSurfaces();
-	void addEnemy(float rate, int speed);
-	void updateEnemies();
-	void removeEnemies();
 	void updateRect(SDL_Rect *rect, int x, int y, int w, int h);
 	bool running(){ return isRunning; }
-	void checkPause();
+
+	void addEnemy(float rate);
+	void updateEnemies(int speed);
+	void removeEnemies();
+
 	SDL_Texture *generateTexture(const char *filename);
 	SDL_Texture *generateFont(const char *filename, int fontSize, const char *text, SDL_Color color);
 

@@ -1,32 +1,32 @@
 #include "game.hpp"
 #include "agent.hpp"
 
+#define ENEMY_RATE (0.02)
+#define ENEMY_SPEED (10)
+#define PLAYER_SPEED (5)
+
 Game::Game(){}
 Game::~Game(){}
 
 // Initialize gaming window
 void Game::init(const char *title, int xpos, int ypos, int width, int height, bool fullscreen){
     int flags = SDL_WINDOW_RESIZABLE;
-    if (fullscreen){
+    if(fullscreen){
         flags |= SDL_WINDOW_FULLSCREEN;
     }
 
-    // Initialize window, renderer, colros
-    if (SDL_Init(SDL_INIT_EVERYTHING) == 0){
+    // Initialize window, renderer, colors
+    if(SDL_Init(SDL_INIT_EVERYTHING) == 0){
         std::cout << "Subsystems Initialized" << std::endl;
-        
         window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
-        if (window){
+        if(window){
             std::cout << "Window Created" << std::endl;
         }
-
         renderer = SDL_CreateRenderer(window, -1, 0);
-        if (renderer){
+        if(renderer){
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            
         }
-        if( TTF_Init() >= 0 )
-        {
+        if(TTF_Init() >= 0){
             std::cout << "TTF Initialized" << std::endl;   
         }
         else{
@@ -40,7 +40,7 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 
     // initialize player
     player = new Player();
-    player->init("../assets/character.png", 0, 0, height/5, width/3.5, renderer, 5);
+    player->init("../assets/character.png", 0, 0, height/5, width/3.5, renderer);
 
     // set width, height for window
     this->width = width;
@@ -54,14 +54,14 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 // Render start screen
 void Game::startScreen(double blinkRate){
     bool blink = false;
-    while (!keystate[SDL_SCANCODE_RETURN] && isRunning){
+    while(!keystate[SDL_SCANCODE_RETURN] && isRunning){
         SDL_GetWindowSize(window, &width, &height);
         updateRect(&spaceRect1, 0, 0, width, height);
         updateRect(&spaceRect2, width, 0, width, height);
         updateRect(&messageRect, width/2 - messageRect.w/2, height/2 - messageRect.h, 600, 300);
         updateRect(&instructionRect, messageRect.x + messageRect.w/8, messageRect.y + messageRect.h, 400, 100);
         int delay = time(NULL) - lastBlink;
-        if (delay > blinkRate){
+        if(delay > blinkRate){
             blink = !blink;
             lastBlink = time(NULL);
         }
@@ -70,7 +70,7 @@ void Game::startScreen(double blinkRate){
         SDL_RenderCopy(renderer, spaceTex1, NULL, NULL);
         SDL_RenderCopy(renderer, spaceTex2, NULL, NULL);
         SDL_RenderCopy(renderer, messageTex, NULL, &messageRect);
-        if (blink){
+        if(blink){
             SDL_RenderCopy(renderer, instructionTex, NULL, &instructionRect);
         }
         SDL_RenderPresent(renderer);
@@ -108,7 +108,7 @@ void Game::update(){
     int w = width;
     int h = height;
     SDL_GetWindowSize(window, &width, &height);
-    if (w != width or h != height){
+    if(w != width or h != height){
         updateRect(&spaceRect1, 0, 0, width, height);
         updateRect(&spaceRect2, width, 0, width, height);
     }
@@ -116,9 +116,9 @@ void Game::update(){
         updateRect(&spaceRect1, spaceRect1.x, spaceRect1.y, width, height);
         updateRect(&spaceRect2, spaceRect2.x, spaceRect2.y, width, height);
     }
-    player->updatePosition(width, height, keystate, &spaceRect1, &spaceRect2);
-    addEnemy(0.02, 10);
-    updateEnemies();
+    player->updatePosition(width, height, PLAYER_SPEED, keystate, &spaceRect1, &spaceRect2);
+    addEnemy(ENEMY_RATE);
+    updateEnemies(ENEMY_SPEED);
     removeEnemies();
 }
 
@@ -129,7 +129,7 @@ void Game::render(){
     SDL_RenderCopy(renderer, spaceTex1, NULL, &spaceRect1);
     SDL_RenderCopy(renderer, spaceTex2, NULL, &spaceRect2);
     player->render();
-    for (auto it = enemies.begin(); it != enemies.end(); it++){
+    for(auto it = enemies.begin(); it != enemies.end(); it++){
         (*it)->render();
     }
     SDL_RenderPresent(renderer);
@@ -144,13 +144,13 @@ void Game::clean(){
 }
 
 // populate deque with enemy after 'rate' seconds
-void Game::addEnemy(float rate, int speed){
+void Game::addEnemy(float rate){
     float delay = ((float)(clock() - lastEnemyTime)) / CLOCKS_PER_SEC;
     if (delay > rate){
         lastEnemyTime = clock();
         srand(rand());
         Triangle *enemy = new Triangle();
-        enemy->init("../assets/triangle.png", width, rand() % (height-100), width/10, height/6, renderer, speed);
+        enemy->init("../assets/triangle.png", width, rand() % (height-100), width/10, height/6, renderer);
         enemies.push_back(enemy);
     }
 }
@@ -163,9 +163,9 @@ void Game::removeEnemies(){
 }
 
 // update enemy positions
-void Game::updateEnemies(){
+void Game::updateEnemies(int speed){
     for (auto it = enemies.begin(); it != enemies.end(); it++){
-        (*it)->updatePosition(width, height);
+        (*it)->updatePosition(width, height, speed);
     }
 }
 
@@ -179,9 +179,9 @@ SDL_Texture *Game::generateTexture(const char *filename){
 
 // generate SDL font given file name and relevant parameters
 SDL_Texture *Game::generateFont(const char *filename, int fontSize, const char *text, SDL_Color color){
-    TTF_Font *font = TTF_OpenFont(filename, fontSize); //this opens a font style and sets a size
-    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface); //now you can convert it into a texture
+    TTF_Font *font = TTF_OpenFont(filename, fontSize); 
+    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color); 
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface); 
     SDL_FreeSurface(surface);
     return texture;
 }
@@ -194,6 +194,7 @@ void Game::updateRect(SDL_Rect *rect, int x, int y, int w, int h){
     rect->h = h;
 }
 
+// Initiate pause menu
 void Game::checkPause(){
     if (keystate[SDL_SCANCODE_P]){
         SDL_Texture *pauseTex = generateFont("../fonts/OpenSans-Regular.ttf", 36, "Game Paused", {255,0,255,255});
@@ -206,7 +207,7 @@ void Game::checkPause(){
 
             updateRect(&messageRect, width/2 - messageRect.w/2, height/2 - messageRect.h, 600, 300);
             updateRect(&instructionRect, messageRect.x + messageRect.w/8, messageRect.y + messageRect.h, 400, 100);
-            if (w != width or h != height){
+            if(w != width or h != height){
                 updateRect(&spaceRect1, 0, 0, width, height);
                 updateRect(&spaceRect2, width, 0, width, height);
             }
@@ -214,12 +215,11 @@ void Game::checkPause(){
                 updateRect(&spaceRect1, spaceRect1.x, spaceRect1.y, width, height);
                 updateRect(&spaceRect2, spaceRect2.x, spaceRect2.y, width, height);
             }
-
             SDL_RenderClear(renderer);
             SDL_RenderCopy(renderer, spaceTex1, NULL, &spaceRect1);
             SDL_RenderCopy(renderer, spaceTex2, NULL, &spaceRect2);
             player->render();
-            for (auto it = enemies.begin(); it != enemies.end(); it++){
+            for(auto it = enemies.begin(); it != enemies.end(); it++){
                 (*it)->render();
             }
             SDL_RenderCopy(renderer, pauseTex, NULL, &messageRect);
@@ -229,3 +229,24 @@ void Game::checkPause(){
     }
 }
 
+// Game running loop
+void Game::run(){
+    int frameTime;
+    uint32_t frameStart;
+    const int FPS = 60;
+    const int frameDelay = 1000 / FPS;
+
+    while(isRunning){
+        frameStart = SDL_GetTicks();
+
+        handleEvents();
+        update();
+        render();
+
+        frameTime = SDL_GetTicks() - frameStart;
+        if (frameDelay > frameTime){
+            SDL_Delay(frameDelay - frameTime);
+        }
+    }
+    clean();
+}
