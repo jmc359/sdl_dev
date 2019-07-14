@@ -26,6 +26,7 @@ public:
 	void removeEnemies();
 	void updateRect(SDL_Rect *rect, int x, int y, int w, int h);
 	bool running(){ return isRunning; }
+	void checkPause();
 	SDL_Texture *generateTexture(const char *filename);
 	SDL_Texture *generateFont(const char *filename, int fontSize, const char *text, SDL_Color color);
 

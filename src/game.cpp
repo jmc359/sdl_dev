@@ -39,7 +39,7 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
     }
 
     // initialize player
-    player = new Agent();
+    player = new Player();
     player->init("../assets/character.png", 0, 0, 256, 192, renderer, 5);
 
     // set width, height for window
@@ -103,6 +103,7 @@ void Game::handleEvents(){
 
 // Move agents and textures appropriately
 void Game::update(){
+    checkPause();
     int w = width;
     int h = height;
     SDL_GetWindowSize(window, &width, &height);
@@ -148,7 +149,7 @@ void Game::addEnemy(float rate, int speed){
         lastEnemyTime = clock();
         srand(rand());
         Triangle *enemy = new Triangle();
-        enemy->init("../assets/triangle.png", width, rand() % (height-100), 100, 100, renderer, speed);
+        enemy->init("../assets/triangle.png", width, rand() % (height-100), width/10, height/6, renderer, speed);
         enemies.push_back(enemy);
     }
 }
@@ -163,7 +164,7 @@ void Game::removeEnemies(){
 // update enemy positions
 void Game::updateEnemies(){
     for (auto it = enemies.begin(); it != enemies.end(); it++){
-        (*it)->updatePosition();
+        (*it)->updatePosition(width, height);
     }
 }
 
@@ -190,5 +191,40 @@ void Game::updateRect(SDL_Rect *rect, int x, int y, int w, int h){
     rect->y = y;
     rect->w = w;
     rect->h = h;
+}
+
+void Game::checkPause(){
+    if (keystate[SDL_SCANCODE_P]){
+        SDL_Texture *pauseTex = generateFont("../fonts/OpenSans-Regular.ttf", 36, "Game Paused", {255,0,255,255});
+        SDL_Texture *cueTex = generateFont("../fonts/OpenSans-Regular.ttf", 24, "Press 'R' to Resume", {255,255,255,255});
+        while(!keystate[SDL_SCANCODE_R] && isRunning){
+            handleEvents();
+            int w = width;
+            int h = height;
+            SDL_GetWindowSize(window, &width, &height);
+
+            updateRect(&messageRect, width/2 - messageRect.w/2, height/2 - messageRect.h, 600, 300);
+            updateRect(&instructionRect, messageRect.x + messageRect.w/8, messageRect.y + messageRect.h, 400, 100);
+            if (w != width or h != height){
+                updateRect(&spaceRect1, 0, 0, width, height);
+                updateRect(&spaceRect2, width, 0, width, height);
+            }
+            else{
+                updateRect(&spaceRect1, spaceRect1.x, spaceRect1.y, width, height);
+                updateRect(&spaceRect2, spaceRect2.x, spaceRect2.y, width, height);
+            }
+
+            SDL_RenderClear(renderer);
+            SDL_RenderCopy(renderer, spaceTex1, NULL, &spaceRect1);
+            SDL_RenderCopy(renderer, spaceTex2, NULL, &spaceRect2);
+            player->render();
+            for (auto it = enemies.begin(); it != enemies.end(); it++){
+                (*it)->render();
+            }
+            SDL_RenderCopy(renderer, pauseTex, NULL, &messageRect);
+            SDL_RenderCopy(renderer, cueTex, NULL, &instructionRect);
+            SDL_RenderPresent(renderer);    
+        }
+    }
 }
 
