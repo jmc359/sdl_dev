@@ -27,6 +27,7 @@ public:
 	bool running(){ return isRunning; }
 	void log(const char *message);
 	void startScreen(double blinkRate);
+	bool detectCollision(SDL_Rect *r1, SDL_Rect *r2);
 
 	void addEnemy(float rate);
 	void updateEnemies(int speed);

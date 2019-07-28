@@ -46,7 +46,7 @@ void Game::init(const char *title, int width, int height, bool fullscreen, bool 
 
     // initialize player
     player = new Player();
-    player->init("../assets/character.png", 0, 0, height/5, width/3.5, renderer);
+    player->init("../assets/character.png", 0, 0, width/8, height/4, renderer);
 
     createSurfaces();
     startScreen(0.5);
@@ -152,7 +152,7 @@ void Game::addEnemy(float rate){
         lastEnemyTime = clock();
         srand(rand());
         Triangle *enemy = new Triangle();
-        enemy->init("../assets/triangle.png", width, rand() % (height-100), width/10, height/6, renderer);
+        enemy->init("../assets/triangle.png", width, rand() % (height-100), width/20, height/10, renderer);
         enemies.push_back(enemy);
     }
 }
@@ -166,8 +166,14 @@ void Game::removeEnemies(){
 
 // update enemy positions
 void Game::updateEnemies(int speed){
-    for (auto it = enemies.begin(); it != enemies.end(); it++){
-        (*it)->updatePosition(width, height, speed);
+    for (auto it = enemies.begin(); it != enemies.end(); ){
+        if(detectCollision(&(player->rect), &((*it)->rect))){
+            enemies.erase(it++);
+        }
+        else{
+            (*it)->updatePosition(width, height, speed);
+            ++it;
+        }
     }
 }
 
@@ -259,4 +265,16 @@ void Game::log(const char *message){
     if (debug){
         std::cout << message << std::endl;
     }
+}
+
+bool Game::detectCollision(SDL_Rect *r1, SDL_Rect *r2){
+    int width1 = r1->x + r1->w;
+    int height1 = r1->y + r1->h;
+    int width2 = r2->x + r2->w;
+    int height2 = r2->y + r2->h;
+
+    if (r1->x < width2 and width1 > r2->x and r1->y < height2 and height1 >r2->y){
+        return true;
+    }
+    return false;
 }
