@@ -3,10 +3,9 @@ Repository for C++ game engineering
 
 ## Setup (MacOS)
 ```
-brew install sdl2
-brew install sdl2_image
-brew install sdl2_ttf
+brew install sdl2 sdl2_image sdl2_ttf
 ```
+
 ## Usage
 ```
 cd build
