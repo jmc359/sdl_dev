@@ -15,17 +15,18 @@ public:
 	Game();
 	~Game();
 
-	void init(const char *title, int xpos, int ypos, int width, int height, bool fullscreen);
-	void startScreen(double blinkRate);
-	void checkPause();
+	void init(const char *title, int width, int height, bool fullscreen, bool debug);
 	void handleEvents();
 	void update();
+	void checkPause();
 	void render();
 	void clean();
 	void run();
 	void createSurfaces();
 	void updateRect(SDL_Rect *rect, int x, int y, int w, int h);
 	bool running(){ return isRunning; }
+	void log(const char *message);
+	void startScreen(double blinkRate);
 
 	void addEnemy(float rate);
 	void updateEnemies(int speed);
@@ -41,7 +42,7 @@ private:
 
 	int width; 
 	int height; 
-	bool isRunning;
+	bool isRunning, debug;
 	const char *title;
 	Agent *player; 
 	std::deque<Triangle *> enemies;

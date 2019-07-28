@@ -9,28 +9,34 @@ Game::Game(){}
 Game::~Game(){}
 
 // Initialize gaming window
-void Game::init(const char *title, int xpos, int ypos, int width, int height, bool fullscreen){
+void Game::init(const char *title, int width, int height, bool fullscreen, bool debug){
     int flags = SDL_WINDOW_RESIZABLE;
     if(fullscreen){
         flags |= SDL_WINDOW_FULLSCREEN;
     }
 
+    // set title, width, height for window, and debug flag
+    this->title = title;
+    this->width = width;
+    this->height = height;
+    this->debug = debug;
+
     // Initialize window, renderer, colors
     if(SDL_Init(SDL_INIT_EVERYTHING) == 0){
-        std::cout << "Subsystems Initialized" << std::endl;
-        window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
+        log("Subsystems initialized");
+        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
         if(window){
-            std::cout << "Window Created" << std::endl;
+            log("Window created");
         }
         renderer = SDL_CreateRenderer(window, -1, 0);
         if(renderer){
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         }
         if(TTF_Init() >= 0){
-            std::cout << "TTF Initialized" << std::endl;   
+            log("TTF initialized");   
         }
         else{
-            std::cout << TTF_GetError() << std::endl;
+            log(TTF_GetError());
         }
         isRunning = true;
     }
@@ -41,11 +47,6 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
     // initialize player
     player = new Player();
     player->init("../assets/character.png", 0, 0, height/5, width/3.5, renderer);
-
-    // set width, height for window
-    this->width = width;
-    this->height = height;
-    this->title = title;
 
     createSurfaces();
     startScreen(0.5);
@@ -79,6 +80,7 @@ void Game::startScreen(double blinkRate){
 
 // create all background surfaces
 void Game::createSurfaces(){
+    log("Background created");
     spaceTex1 = generateTexture("../assets/space.png");
     spaceTex2 = generateTexture("../assets/space.png");
     messageTex = generateFont("../fonts/OpenSans-Regular.ttf", 36, title, {255,0,0,255});
@@ -140,7 +142,7 @@ void Game::clean(){
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
     SDL_Quit();
-    std::cout << "Game Cleaned" << std::endl;
+    log("Game cleaned");
 }
 
 // populate deque with enemy after 'rate' seconds
@@ -197,6 +199,7 @@ void Game::updateRect(SDL_Rect *rect, int x, int y, int w, int h){
 // Initiate pause menu
 void Game::checkPause(){
     if (keystate[SDL_SCANCODE_P]){
+        log("Game paused");
         SDL_Texture *pauseTex = generateFont("../fonts/OpenSans-Regular.ttf", 36, "Game Paused", {255,0,255,255});
         SDL_Texture *cueTex = generateFont("../fonts/OpenSans-Regular.ttf", 24, "Press 'R' to Resume", {255,255,255,255});
         while(!keystate[SDL_SCANCODE_R] && isRunning){
@@ -226,6 +229,7 @@ void Game::checkPause(){
             SDL_RenderCopy(renderer, cueTex, NULL, &instructionRect);
             SDL_RenderPresent(renderer);    
         }
+        log("Game resumed");
     }
 }
 
@@ -249,4 +253,10 @@ void Game::run(){
         }
     }
     clean();
+}
+
+void Game::log(const char *message){
+    if (debug){
+        std::cout << message << std::endl;
+    }
 }

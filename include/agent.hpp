@@ -60,8 +60,8 @@ public:
 		rect.w = screenW/10;
 		rect.h = screenH/6;
 		if (rect.x + rect.w > 0){
-	        rect.x -= moveRate;
-	    }
+		    rect.x -= moveRate;
+		}
 	}
 };
 
