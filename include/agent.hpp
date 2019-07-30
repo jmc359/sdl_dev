@@ -26,6 +26,8 @@ public:
 	using Agent::updatePosition;
 	virtual void updatePosition(int screenW, int screenH, int moveRate, const Uint8* keystate, SDL_Rect *spaceRect1, SDL_Rect *spaceRect2){
 	    // Move character according to keystroke
+	    rect.w = screenW/8;
+	    rect.h = screenH/4;
 	    if (keystate[SDL_SCANCODE_LEFT] && rect.x >= 0){
 	        rect.x -= moveRate;
 	    }
@@ -48,6 +50,9 @@ public:
 	    if (keystate[SDL_SCANCODE_DOWN] && rect.y + rect.h <= screenH){
 	        rect.y += moveRate;
 	    }
+	    if (keystate[SDL_SCANCODE_SPACE]){
+	    	;
+	    }
 	}
 };
 
@@ -55,6 +60,8 @@ class Triangle : public Agent{
 public:
 	using Agent::updatePosition;
 	virtual void updatePosition(int screenW, int screenH, int moveRate){
+		rect.w = screenW/20;
+		rect.h = screenH/10;
 		if (rect.x + rect.w > 0){
 		    rect.x -= moveRate;
 		}

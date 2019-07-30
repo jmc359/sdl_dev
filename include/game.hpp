@@ -8,6 +8,7 @@
 #include <time.h>
 #include <iostream>
 #include <deque>
+#include <ctime>
 #include "agent.hpp"
 
 class Game{
@@ -15,7 +16,7 @@ public:
 	Game();
 	~Game();
 
-	void init(const char *title, int width, int height, bool fullscreen, bool debug);
+	void init(const char *title, int width, int height, bool fullscreen, bool logger);
 	void handleEvents();
 	void update();
 	void checkPause();
@@ -25,7 +26,7 @@ public:
 	void createSurfaces();
 	void updateRect(SDL_Rect *rect, int x, int y, int w, int h);
 	bool running(){ return isRunning; }
-	void log(const char *message);
+	void log(const char *message, const char *level="DEBUG");
 	void startScreen(double blinkRate);
 	bool detectCollision(SDL_Rect *r1, SDL_Rect *r2);
 
@@ -43,7 +44,7 @@ private:
 
 	int width; 
 	int height; 
-	bool isRunning, debug;
+	bool isRunning, logger;
 	const char *title;
 	Agent *player; 
 	std::deque<Triangle *> enemies;

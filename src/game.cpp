@@ -9,17 +9,17 @@ Game::Game(){}
 Game::~Game(){}
 
 // Initialize gaming window
-void Game::init(const char *title, int width, int height, bool fullscreen, bool debug){
+void Game::init(const char *title, int width, int height, bool fullscreen, bool logger){
     int flags = SDL_WINDOW_RESIZABLE;
     if(fullscreen){
         flags |= SDL_WINDOW_FULLSCREEN;
     }
 
-    // set title, width, height for window, and debug flag
+    // set title, width, height for window, and logger flag
     this->title = title;
     this->width = width;
     this->height = height;
-    this->debug = debug;
+    this->logger = logger;
 
     // Initialize window, renderer, colors
     if(SDL_Init(SDL_INIT_EVERYTHING) == 0){
@@ -36,7 +36,7 @@ void Game::init(const char *title, int width, int height, bool fullscreen, bool 
             log("TTF initialized");   
         }
         else{
-            log(TTF_GetError());
+            log(TTF_GetError(), "ERROR");
         }
         isRunning = true;
     }
@@ -97,6 +97,7 @@ void Game::handleEvents(){
 
     switch(event.type){
         case SDL_QUIT:
+            log("Game quit");
             isRunning = false;
             break;
         default:
@@ -261,9 +262,14 @@ void Game::run(){
     clean();
 }
 
-void Game::log(const char *message){
-    if (debug){
-        std::cout << message << std::endl;
+void Game::log(const char *message, const char *level){
+    if (logger){
+        time_t rawtime;
+        char buffer[80];
+        time (&rawtime);
+        struct tm *timeinfo = localtime(&rawtime);
+        strftime(buffer, sizeof(buffer), "[%H:%M:%S] ", timeinfo);
+        std::cout << "[" << level << "]" << buffer << message << std::endl;
     }
 }
 
@@ -273,7 +279,7 @@ bool Game::detectCollision(SDL_Rect *r1, SDL_Rect *r2){
     int width2 = r2->x + r2->w;
     int height2 = r2->y + r2->h;
 
-    if (r1->x < width2 and width1 > r2->x and r1->y < height2 and height1 >r2->y){
+    if (r1->x < width2 and r2->x < width1 and r1->y < height2 and r2->y < height1){
         return true;
     }
     return false;
