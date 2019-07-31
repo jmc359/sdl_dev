@@ -3,6 +3,7 @@
 
 #define ENEMY_RATE (0.02)
 #define ENEMY_SPEED (10)
+#define MISSILE_SPEED (5)
 #define PLAYER_SPEED (5)
 
 Game::Game(){}
@@ -122,6 +123,8 @@ void Game::update(){
     player->updatePosition(width, height, PLAYER_SPEED, keystate, &spaceRect1, &spaceRect2);
     addEnemy(ENEMY_RATE);
     updateEnemies(ENEMY_SPEED);
+    player->updateMissiles(MISSILE_SPEED, width, enemies);
+    player->removeMissiles(width);
     removeEnemies();
 }
 
@@ -132,9 +135,8 @@ void Game::render(){
     SDL_RenderCopy(renderer, spaceTex1, NULL, &spaceRect1);
     SDL_RenderCopy(renderer, spaceTex2, NULL, &spaceRect2);
     player->render();
-    for(auto it = enemies.begin(); it != enemies.end(); it++){
-        (*it)->render();
-    }
+    player->renderMissiles();
+    renderEnemies();
     SDL_RenderPresent(renderer);
 }
 
@@ -144,6 +146,12 @@ void Game::clean(){
     SDL_DestroyRenderer(renderer);
     SDL_Quit();
     log("Game cleaned");
+}
+
+void Game::renderEnemies(){
+    for(auto it = enemies.begin(); it != enemies.end(); it++){
+        (*it)->render();
+    }
 }
 
 // populate deque with enemy after 'rate' seconds
@@ -168,7 +176,7 @@ void Game::removeEnemies(){
 // update enemy positions
 void Game::updateEnemies(int speed){
     for (auto it = enemies.begin(); it != enemies.end(); ){
-        if(detectCollision(&(player->rect), &((*it)->rect))){
+        if((*it)->detectCollision(&(player->rect))){
             enemies.erase(it++);
         }
         else{
@@ -271,16 +279,4 @@ void Game::log(const char *message, const char *level){
         strftime(buffer, sizeof(buffer), "[%H:%M:%S] ", timeinfo);
         std::cout << "[" << level << "]" << buffer << message << std::endl;
     }
-}
-
-bool Game::detectCollision(SDL_Rect *r1, SDL_Rect *r2){
-    int width1 = r1->x + r1->w;
-    int height1 = r1->y + r1->h;
-    int width2 = r2->x + r2->w;
-    int height2 = r2->y + r2->h;
-
-    if (r1->x < width2 and r2->x < width1 and r1->y < height2 and r2->y < height1){
-        return true;
-    }
-    return false;
 }
