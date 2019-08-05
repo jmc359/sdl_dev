@@ -12,7 +12,6 @@ public:
 	Agent();
 	~Agent();
 	void init(const char *assetFile, int xPos, int yPos, int width, int height, SDL_Renderer *renderer);
-	bool detectCollision(SDL_Rect *r);
 	void updatePosition(){};
 	void render();
 	SDL_Rect rect;
@@ -52,10 +51,10 @@ public:
 	    // Move character according to keystroke
 	    rect.w = screenW/8;
 	    rect.h = screenH/4;
-	    if (keystate[SDL_SCANCODE_LEFT] && rect.x >= 0){
+	    if (keystate[SDL_SCANCODE_LEFT] and rect.x >= 0){
 	        rect.x -= moveRate;
 	    }
-	    if (keystate[SDL_SCANCODE_RIGHT] && rect.x + rect.w/2 <= screenW/2){
+	    if (keystate[SDL_SCANCODE_RIGHT] and rect.x + rect.w/2 <= screenW/2){
 	        rect.x += moveRate;
 	    }
 	    else if (keystate[SDL_SCANCODE_RIGHT]){
@@ -68,10 +67,10 @@ public:
 	            spaceRect2->x = spaceRect2->w;
 	        }
 	    }
-	    if (keystate[SDL_SCANCODE_UP] && rect.y >= 0){
+	    if (keystate[SDL_SCANCODE_UP] and rect.y >= 0){
 	        rect.y -= moveRate;
 	    }
-	    if (keystate[SDL_SCANCODE_DOWN] && rect.y + rect.h <= screenH){
+	    if (keystate[SDL_SCANCODE_DOWN] and rect.y + rect.h <= screenH){
 	        rect.y += moveRate;
 	    }
 	    if (keystate[SDL_SCANCODE_SPACE]){
@@ -81,45 +80,16 @@ public:
 	    }
 	}
 
-	void updateMissiles(int speed, int width, std::deque<Triangle *>& enemies){
-		// update missiles, accounting for collisions
-	    for (auto it = missiles.begin(); it != missiles.end(); ){
-	    	bool collision = false;
-	    	for (auto it1 = enemies.begin(); it1 != enemies.end(); ){
-	    		if((*it)->detectCollision(&((*it1)->rect))){
-	    			collision = true;
-		            missiles.erase(it++);
-		            enemies.erase(it1++);
-		            break;
-		        }
-		        else{
-			        ++it1;
-		        }
-	    	}
-	    	if (not collision){
-	    		(*it++)->updatePosition(speed);
-	    	}
-	    }
-	}
-
-	void removeMissiles(int width){
-		// pop missiles that go offscreen
-	    while(missiles.size() > 0 && missiles.front()->rect.x >= width){
-	        missiles.pop_front();
-	    }
-	}
-
 	void renderMissiles(){
-		;// render missiles
+		// render missiles
 		for (auto it = missiles.begin(); it != missiles.end(); it++){
 			(*it)->render();
 		}
 	}
+	std::deque<Missile *> missiles;
 
 protected:
-	std::deque<Missile *> missiles;
 	int max_missiles = 10;
-
 };
 
 #endif

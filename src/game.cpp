@@ -56,7 +56,7 @@ void Game::init(const char *title, int width, int height, bool fullscreen, bool 
 // Render start screen
 void Game::startScreen(double blinkRate){
     bool blink = false;
-    while(!keystate[SDL_SCANCODE_RETURN] && isRunning){
+    while(!keystate[SDL_SCANCODE_RETURN] and isRunning){
         SDL_GetWindowSize(window, &width, &height);
         updateRect(&spaceRect1, 0, 0, width, height);
         updateRect(&spaceRect2, width, 0, width, height);
@@ -120,12 +120,9 @@ void Game::update(){
         updateRect(&spaceRect1, spaceRect1.x, spaceRect1.y, width, height);
         updateRect(&spaceRect2, spaceRect2.x, spaceRect2.y, width, height);
     }
-    player->updatePosition(width, height, PLAYER_SPEED, keystate, &spaceRect1, &spaceRect2);
     addEnemy(ENEMY_RATE);
-    updateEnemies(ENEMY_SPEED);
-    player->updateMissiles(MISSILE_SPEED, width, enemies);
-    player->removeMissiles(width);
-    removeEnemies();
+    player->updatePosition(width, height, PLAYER_SPEED, keystate, &spaceRect1, &spaceRect2);
+    updateObjects(ENEMY_SPEED, MISSILE_SPEED, player->missiles);
 }
 
 // Add objects to renderer
@@ -166,22 +163,39 @@ void Game::addEnemy(float rate){
     }
 }
 
-// pop enemy from deque
-void Game::removeEnemies(){
-    while(enemies.size() > 0 && enemies.front()->rect.x + enemies.front()->rect.w <= 0){
-        enemies.pop_front();
-    }
-}
-
 // update enemy positions
-void Game::updateEnemies(int speed){
+void Game::updateObjects(int enemy_speed, int missile_speed, std::deque<Missile *>& missiles){
     for (auto it = enemies.begin(); it != enemies.end(); ){
-        if((*it)->detectCollision(&(player->rect))){
+        bool collision = false;
+        if(detectCollision(&(player->rect), &((*it)->rect))){
+            log("Player collided with enemy");
+            collision = true;
             enemies.erase(it++);
         }
         else{
-            (*it)->updatePosition(width, height, speed);
-            ++it;
+            for (auto missile = missiles.begin(); missile != missiles.end(); ){
+                if(detectCollision(&((*missile)->rect), &((*it)->rect))){
+                    log("Missile collided with enemy");
+                    collision = true;
+                    it = enemies.erase(it);
+                    missile = missiles.erase(missile);
+                    break;
+                }
+                else{
+                    (*missile)->updatePosition(missile_speed);
+                    while(missiles.size() > 0 and missiles.front()->rect.x + enemies.front()->rect.w >= width){
+                        missiles.pop_front();
+                    }
+                    missile++;
+                }
+            }
+            if (not collision and it != enemies.end()){
+                (*it)->updatePosition(width, height, enemy_speed);
+                while(enemies.size() > 0 and enemies.front()->rect.x + enemies.front()->rect.w <= 0){
+                    enemies.pop_front();
+                }
+                ++it;
+            }
         }
     }
 }
@@ -217,7 +231,7 @@ void Game::checkPause(){
         log("Game paused");
         SDL_Texture *pauseTex = generateFont("../fonts/OpenSans-Regular.ttf", 36, "Game Paused", {255,0,255,255});
         SDL_Texture *cueTex = generateFont("../fonts/OpenSans-Regular.ttf", 24, "Press 'R' to Resume", {255,255,255,255});
-        while(!keystate[SDL_SCANCODE_R] && isRunning){
+        while(!keystate[SDL_SCANCODE_R] and isRunning){
             handleEvents();
             int w = width;
             int h = height;
@@ -279,4 +293,16 @@ void Game::log(const char *message, const char *level){
         strftime(buffer, sizeof(buffer), "[%H:%M:%S] ", timeinfo);
         std::cout << "[" << level << "]" << buffer << message << std::endl;
     }
+}
+
+bool Game::detectCollision(SDL_Rect *r1, SDL_Rect *r2){
+    int width1 = r1->x + r1->w;
+    int height1 = r1->y + r1->h;
+    int width2 = r2->x + r2->w;
+    int height2 = r2->y + r2->h;
+
+    if (r1->x < width2 and r2->x < width1 and r1->y < height2 and r2->y < height1){
+        return true;
+    }
+    return false;
 }
