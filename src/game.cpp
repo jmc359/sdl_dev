@@ -3,7 +3,7 @@
 
 #define ENEMY_RATE (0.02)
 #define ENEMY_SPEED (10)
-#define MISSILE_SPEED (5)
+#define MISSILE_SPEED (10)
 #define PLAYER_SPEED (5)
 
 Game::Game(){}
@@ -145,6 +145,7 @@ void Game::clean(){
     log("Game cleaned");
 }
 
+// render all enemies
 void Game::renderEnemies(){
     for(auto it = enemies.begin(); it != enemies.end(); it++){
         (*it)->render();
@@ -178,7 +179,6 @@ void Game::updateObjects(int enemy_speed, int missile_speed, std::deque<Missile 
                     log("Missile collided with enemy");
                     collision = true;
                     it = enemies.erase(it);
-                    missile = missiles.erase(missile);
                     break;
                 }
                 else{
@@ -284,6 +284,7 @@ void Game::run(){
     clean();
 }
 
+// log game status if option specified in game->init()
 void Game::log(const char *message, const char *level){
     if (logger){
         time_t rawtime;
@@ -295,6 +296,7 @@ void Game::log(const char *message, const char *level){
     }
 }
 
+// function for calculating collisions between bounding boxes
 bool Game::detectCollision(SDL_Rect *r1, SDL_Rect *r2){
     int width1 = r1->x + r1->w;
     int height1 = r1->y + r1->h;

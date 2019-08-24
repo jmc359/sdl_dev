@@ -32,7 +32,6 @@ protected:
 	bool detectCollision(SDL_Rect *r1, SDL_Rect *r2);
 	void addEnemy(float rate);
 	void updateObjects(int enemy_speed, int missile_speed, std::deque<Missile *>& missiles);
-	// void removeEnemies();
 	void renderEnemies();
 
 	SDL_Texture *generateTexture(const char *filename);
